@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
 import 'package:store_launcher/store_launcher.dart';
 
 void main() => runApp(MyApp());
@@ -12,32 +11,29 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
+  final myController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    initPlatformState();
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
+  @override
+  void dispose() {
+    myController.dispose();
+    super.dispose();
+  }
+
+  Future<void> openWithStore() async {
+    var appId = myController.text;
+    print('app id: $appId');
     try {
-      platformVersion = await StoreLauncher.platformVersion;
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
+      StoreLauncher.openWithStore(appId).catchError((e) {
+        print('ERROR> $e');
+      });
+    } on Exception catch (e) {
+      print('$e');
     }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
   }
 
   @override
@@ -45,10 +41,29 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Plugin store_launcher example app'),
         ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+        body: Container(
+          padding: EdgeInsets.all(12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              TextField(
+                controller: myController,
+                decoration: InputDecoration(
+                    hintText: 'Please enter Package Name',
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.teal))),
+              ),
+              RaisedButton(
+                onPressed: () {
+                  openWithStore();
+                },
+                child: Text('Open With Store'),
+              ),
+            ],
+          ),
         ),
       ),
     );
