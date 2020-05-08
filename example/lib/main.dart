@@ -14,11 +14,6 @@ class _MyAppState extends State<MyApp> {
   final myController = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   void dispose() {
     myController.dispose();
     super.dispose();
