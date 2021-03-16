@@ -1,3 +1,9 @@
+# Changelog
+
+## 2.0.0
+
+* Null safety
+
 ## 1.0.1
 
 * Published to pub
