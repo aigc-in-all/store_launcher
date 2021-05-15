@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ResolveInfo
 import android.net.Uri
-import androidx.annotation.NonNull;
+import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -14,14 +14,14 @@ import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
 
 /** StoreLauncherPlugin */
-public class StoreLauncherPlugin : FlutterPlugin, MethodCallHandler {
+class StoreLauncherPlugin : FlutterPlugin, MethodCallHandler {
 
     private lateinit var context: Context
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         val channel = MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "store_launcher")
         context = flutterPluginBinding.applicationContext
-        channel.setMethodCallHandler(this);
+        channel.setMethodCallHandler(this)
     }
 
     // This static function is optional and equivalent to onAttachedToEngine. It supports the old
@@ -63,7 +63,7 @@ public class StoreLauncherPlugin : FlutterPlugin, MethodCallHandler {
 
     private fun openWithPlayStore(appId: String): Boolean {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appId"))
-        var marketFounded = false
+        var marketFound = false
         val apps: List<ResolveInfo> = context.packageManager.queryIntentActivities(intent, 0)
         for (app in apps) {
             if (app.activityInfo.applicationInfo.packageName != "com.android.vending") {
@@ -82,10 +82,10 @@ public class StoreLauncherPlugin : FlutterPlugin, MethodCallHandler {
             // intercept the intent
             intent.component = componentName
             context.startActivity(intent)
-            marketFounded = true
+            marketFound = true
             break
         }
-        if (!marketFounded) {
+        if (!marketFound) {
             val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$appId"))
             if (webIntent.resolveActivity(context.packageManager) == null) {
                 return false
