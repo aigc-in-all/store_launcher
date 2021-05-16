@@ -1,6 +1,6 @@
 name: store_launcher
-description: A Flutter plugin for launching a Store in the mobile platform. Supports AppStore and PlayStore.
-version: 2.0.0
+description: A Flutter plugin for launching a Store in the mobile platform. Supports AppStore, PlayStore and AppGallery.
+version: 2.0.1
 homepage: https://github.com/heqingbao/store_launcher
 
 environment:

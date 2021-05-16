@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1
+
+* Support for Huawei AppGallery
+
 ## 2.0.0
 
 * Null safety

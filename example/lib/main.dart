@@ -51,7 +51,7 @@ class _MyAppState extends State<MyApp> {
                     border: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.teal))),
               ),
-              RaisedButton(
+              ElevatedButton(
                 onPressed: () {
                   openWithStore();
                 },

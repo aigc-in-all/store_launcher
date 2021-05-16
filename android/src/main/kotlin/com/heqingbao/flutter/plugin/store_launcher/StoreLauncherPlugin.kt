@@ -12,6 +12,7 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
+import android.content.pm.PackageManager
 
 /** StoreLauncherPlugin */
 class StoreLauncherPlugin : FlutterPlugin, MethodCallHandler {
@@ -48,7 +49,7 @@ class StoreLauncherPlugin : FlutterPlugin, MethodCallHandler {
                 return
             }
             val packageName: String = call.argument("app_id")!!
-            if (openWithPlayStore(packageName)) {
+            if (openWithStore(packageName)) {
                 result.success("ok")
             } else {
                 result.error("1", "Unknown Error in method: (${call.method})", null)
@@ -61,37 +62,53 @@ class StoreLauncherPlugin : FlutterPlugin, MethodCallHandler {
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     }
 
-    private fun openWithPlayStore(appId: String): Boolean {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appId"))
-        var marketFound = false
-        val apps: List<ResolveInfo> = context.packageManager.queryIntentActivities(intent, 0)
-        for (app in apps) {
-            if (app.activityInfo.applicationInfo.packageName != "com.android.vending") {
-                continue
-            }
-            val act = app.activityInfo
-            val componentName = ComponentName(act.applicationInfo.packageName, act.name)
+    private fun isPackageInstalled(packageName: String, packageManager: PackageManager): Boolean {
+        return try {
+            packageManager.getApplicationInfo(packageName, 0).enabled
+        }
+        catch (e: PackageManager.NameNotFoundException) {
+            false
+        }
+    }
+
+    private fun launchIntent(url: String, packageName: String): Boolean {
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse(url)
             // make sure it does NOT open in the stack of your activity
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             // task reparenting if needed
-            intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
+            addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
             // if the Google Play was already open in a search result
             //  this make sure it still go to the app page you requested
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            // this make sure only the Google Play app is allowed to
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            // this make sure only the appropriate app is allowed to
             // intercept the intent
-            intent.component = componentName
-            context.startActivity(intent)
-            marketFound = true
-            break
+            setPackage(packageName)
         }
-        if (!marketFound) {
-            val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$appId"))
-            if (webIntent.resolveActivity(context.packageManager) == null) {
-                return false
-            }
-            context.startActivity(intent)
-        }
+        context.startActivity(intent)
         return true
+    }
+
+    private fun launchWeb(url: String): Boolean {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        if (intent.resolveActivity(context.packageManager) == null) {
+            return false
+        }
+        else {
+            context.startActivity(intent)
+            return true
+        }
+    }
+
+    private fun openWithStore(appId: String): Boolean {
+        if (isPackageInstalled("com.android.vending", context.packageManager)) {
+            return launchIntent("market://details?id=$appId", "com.android.vending")
+        }
+        else if (isPackageInstalled("com.huawei.appmarket", context.packageManager)) {
+            return launchIntent("appmarket://details?id=$appId", "com.huawei.appmarket")
+        }
+        else {
+            return launchWeb("https://play.google.com/store/apps/details?id=$appId")
+        }
     }
 }
