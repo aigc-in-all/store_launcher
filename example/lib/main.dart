@@ -26,8 +26,8 @@ class _MyAppState extends State<MyApp> {
       StoreLauncher.openWithStore(appId).catchError((e) {
         print('ERROR> $e');
       });
-    } on Exception catch (e) {
-      print('$e');
+    } catch (e) {
+      print(e.toString());
     }
   }
 
@@ -36,25 +36,23 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin store_launcher example app'),
+          title: Text('Plugin store_launcher example app'),
         ),
         body: Container(
           padding: EdgeInsets.all(12.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
+            children: [
               TextField(
                 controller: myController,
                 decoration: InputDecoration(
-                    hintText: 'Please enter Package Name',
-                    border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.teal))),
+                  hintText: 'Please enter Package Name',
+                  border: OutlineInputBorder(borderSide: BorderSide(color: Colors.teal)),
+                ),
               ),
               ElevatedButton(
-                onPressed: () {
-                  openWithStore();
-                },
+                onPressed: openWithStore,
                 child: Text('Open With Store'),
               ),
             ],
