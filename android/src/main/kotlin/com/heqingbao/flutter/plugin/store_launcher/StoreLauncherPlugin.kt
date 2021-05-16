@@ -78,7 +78,7 @@ class StoreLauncherPlugin : FlutterPlugin, MethodCallHandler {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             // task reparenting if needed
             addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
-            // if the Google Play was already open in a search result
+            // if the app store was already open in a search result
             //  this make sure it still go to the app page you requested
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             // this make sure only the appropriate app is allowed to
